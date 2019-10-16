@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block content %}
+    {% for book in books %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ book.author }}</a>
+            </div>
+            <h2><a class="article-title" href="#">{{ book.title }}</a></h2>
+            <p class="article-content">{{ book.content }}</p>
+          </div>
+        </article>
+    {% endfor %}
+{% endblock content %}
