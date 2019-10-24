@@ -84,18 +84,7 @@ def logout():
 @login_required
 def account():
     profile_pic = url_for('static', filename='profile_pics/' + current_user.profile_pic)
-    user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
-    update_account_form = UpdateAccountForm()
-    if update_account_form.validate_on_submit():
-        current_user.username = update_account_form.username.data
-        current_user.email = update_account_form.email.data
-        db.session.commit()
-        flash('Account information has been updated!', 'success')
-        return redirect(url_for('account'))
-    elif request.method == 'GET':
-        update_account_form.username.data = current_user.username
-        update_account_form.email.data = current_user.email
-    return render_template('account.html', books=user_books, title='Account', profile_pic=profile_pic, form=update_account_form)
+    return render_template('account.html', title='Account', profile_pic=profile_pic)
 
 
 # TODO: If a user is logged in, then allow to add the book to the account.
@@ -106,7 +95,17 @@ def search():
 
 @app.route('/account_settings')
 def account_settings():
-    return render_template('account_settings.html')
+    update_account_form = UpdateAccountForm()
+    if update_account_form.validate_on_submit():
+        current_user.username = update_account_form.username.data
+        current_user.email = update_account_form.email.data
+        db.session.commit()
+        flash('Account information has been updated!', 'success')
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        update_account_form.username.data = current_user.username
+        update_account_form.email.data = current_user.email
+    return render_template('account_settings.html', title='Account Settings', form=update_account_form)
 
 
 @app.route('/additional_stats')
@@ -116,4 +115,5 @@ def additional_stats():
 
 @app.route('/my_books')
 def my_books():
-    return render_template('my_books.html')
+    user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
+    return render_template('my_books.html', books=user_books)

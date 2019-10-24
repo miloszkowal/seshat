@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section">
+    <h1>My Books</h1>
+      {% for book in books %}
+        <article class="media content-section">
+          <div class="media-body">
+            <div class="article-metadata">
+              <a class="mr-2" href="#">{{ book.author }}</a>
+            </div>
+            <h2><a class="article-title" href="#">{{ book.title }}</a></h2>
+            <p class="article-content">{{ book.content }}</p>
+          </div>
+        </article>
+    {% endfor %}
+  </div>
+{% endblock content %}
+{% block sidebar %}
+<div class="col-md-4">
+      <div class="content-section">
+        <h3>Your Account Sidebar</h3>
+        <ul class="list-group mt-2">
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('my_books') }}">My Books</a></li>
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('additional_stats') }}">Additional Stats</a></li>
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+        </ul>
+      </div>
+    </div>
+{% endblock sidebar %}
