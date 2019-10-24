@@ -31,3 +31,7 @@ As it stands, you can do the following:
 * Register as a new user
 * Login in as an existing user (including any users you create)
 * Add Books to the DB (and also to your account)
+
+## Adding Issues
+
+If you notice a bug or would like to suggest an additional feature, please open an issue on GitHub.

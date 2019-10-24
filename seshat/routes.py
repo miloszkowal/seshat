@@ -102,3 +102,18 @@ def account():
 @app.route('/search')
 def search():
     return render_template('search.html', title='Search')
+
+
+@app.route('/account_settings')
+def account_settings():
+    return render_template('account_settings.html')
+
+
+@app.route('/additional_stats')
+def additional_stats():
+    return render_template('additional_stats.html')
+
+
+@app.route('/my_books')
+def my_books():
+    return render_template('my_books.html')
