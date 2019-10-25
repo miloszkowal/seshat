@@ -91,7 +91,6 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic)
 
 
-# TODO: If a user is logged in, then allow to add the book to the account.
 @app.route('/search')
 def search():
     return render_template('search.html', title='Search')
