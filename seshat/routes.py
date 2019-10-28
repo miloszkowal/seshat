@@ -140,9 +140,9 @@ def my_books():
     return render_template('my_books.html', books=user_books)
 
 
-@app.route('/delete_account')
+@app.route('/account/delete_account', methods=['POST'])
 @login_required
-def delete_account(user_id):
+def delete_account():
     User.query.filter(User.id == current_user.id).delete()
     db.session.commit()
     flash('Your account has been deleted!', 'success')
