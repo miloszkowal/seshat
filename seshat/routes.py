@@ -109,6 +109,7 @@ def save_picture(form_picture):
 
 
 @app.route('/account_settings')
+@login_required
 def account_settings():
     update_account_form = UpdateAccountForm()
     if update_account_form.validate_on_submit():
@@ -127,11 +128,22 @@ def account_settings():
 
 
 @app.route('/additional_stats')
+@login_required
 def additional_stats():
     return render_template('additional_stats.html')
 
 
 @app.route('/my_books')
+@login_required
 def my_books():
     user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
     return render_template('my_books.html', books=user_books)
+
+
+@app.route('/delete_account')
+@login_required
+def delete_account(user_id):
+    User.query.filter(User.id == current_user.id).delete()
+    db.session.commit()
+    flash('Your account has been deleted!', 'success')
+    return redirect(url_for('home'))
