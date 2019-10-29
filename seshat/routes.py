@@ -4,6 +4,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flask_login import login_user, logout_user, current_user, login_required
+
 from seshat.forms import BookForm, RegistrationForm, LoginForm, UpdateAccountForm
 from seshat.models import User, Book
 from seshat import app, db, bcrypt
@@ -87,8 +88,10 @@ def logout():
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
+    count = Book.query.join(User.books).filter(User.id == current_user.id).count()
+    pages = db.session.query(db.func.sum(Book.num_pages).label("Total_Pages")).join(User.books).filter(User.id == current_user.id).first()
     profile_pic = url_for('static', filename='profile_pics/' + current_user.profile_pic)
-    return render_template('account.html', title='Account', profile_pic=profile_pic)
+    return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
 @app.route('/search')
@@ -136,8 +139,9 @@ def additional_stats():
 @app.route('/my_books')
 @login_required
 def my_books():
+    count = Book.query.join(User.books).filter(User.id == current_user.id).count()
     user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
-    return render_template('my_books.html', books=user_books)
+    return render_template('my_books.html', books=user_books, count=count)
 
 
 @app.route('/account/delete_account', methods=['POST'])
