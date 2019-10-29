@@ -17,14 +17,5 @@
   </div>
 {% endblock content %}
 {% block sidebar %}
-<div class="col-md-4">
-      <div class="content-section">
-        <h3>Your Account Sidebar</h3>
-        <ul class="list-group mt-2">
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('my_books') }}">My Books</a></li>
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('additional_stats') }}">Additional Stats</a></li>
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
-        </ul>
-      </div>
-    </div>
+{% include "account_sidebar.html" %}
 {% endblock sidebar %}
