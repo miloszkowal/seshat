@@ -89,7 +89,7 @@ def logout():
 @login_required
 def account():
     count = Book.query.join(User.books).filter(User.id == current_user.id).count()
-    pages = db.session.query(db.func.sum(Book.num_pages).label("Total_Pages")).join(User.books).filter(User.id == current_user.id).first()
+    pages = db.session.query(db.func.sum(Book.num_pages).label("Total_Pages")).join(User.books).filter(User.id == current_user.id).first()[0]
     profile_pic = url_for('static', filename='profile_pics/' + current_user.profile_pic)
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
