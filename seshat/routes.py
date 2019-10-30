@@ -5,6 +5,8 @@ from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flask_login import login_user, logout_user, current_user, login_required
 
+from sqlalchemy.exc import IntegrityError
+
 from seshat.forms import BookForm, RegistrationForm, LoginForm, UpdateAccountForm
 from seshat.models import User, Book
 from seshat import app, db, bcrypt
@@ -64,17 +66,20 @@ def add_book():
     if add_book_form.validate_on_submit():
         query_results = Book.query.filter_by(title=add_book_form.title.data).first()
         if query_results:
-            query_results.owners.append(current_user)
-            flash(str(add_book_form.title.data) + ' added to your account!', 'success')
+            try:
+                query_results.owners.append(current_user)
+                db.session.commit()
+                flash(str(add_book_form.title.data) + ' added to your account!', 'success')
+            except IntegrityError:
+                flash('Book already in your account!', 'warning')
+            except:
+                flash('An unknown error occurred. Please try again later.', 'danger')
         else:
             book = Book(title=add_book_form.title.data, author=add_book_form.author.data)
             book.owners.append(current_user)
             db.session.add(book)
             flash(str(add_book_form.title.data) + ' successfully added to DB!', 'success')
-        db.session.commit()
         return redirect(url_for('home'))
-    # else:
-    #     flash('An unknown error occurred. Please try again later.', 'danger')
     return render_template('add_book.html', title='Add A Book', form=add_book_form)
 
 
