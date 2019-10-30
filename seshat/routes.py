@@ -139,9 +139,10 @@ def additional_stats():
 @app.route('/my_books')
 @login_required
 def my_books():
+    title = 'My Books'
     count = Book.query.join(User.books).filter(User.id == current_user.id).count()
     user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
-    return render_template('my_books.html', books=user_books, count=count)
+    return render_template('my_books.html', title=title, books=user_books, count=count)
 
 
 @app.route('/account/delete_account', methods=['POST'])
@@ -151,3 +152,18 @@ def delete_account():
     db.session.commit()
     flash('Your account has been deleted!', 'success')
     return redirect(url_for('home'))
+
+
+@app.route('/book/<int:book_id>')
+def book(book_id):
+    title = 'Book'
+    return render_template('book.html', title=title)
+
+
+@app.route('/book/<int:book_id>/delete', methods=['POST'])
+@login_required
+def delete_book(book_id):
+    book_to_delete = Book.query.get_or_404(book_id)
+    current_user.books.remove(book_to_delete)
+    db.session.commit()
+    return redirect(url_for('my_books'))

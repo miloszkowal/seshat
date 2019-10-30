@@ -2,9 +2,9 @@
 
 ## Introduction
 
-I got tired of goodreads and how a) poor their interface was, b) how every book was three stars because of the amount of people (and bots) on the platform, and c) how it was tied to Amazon, and thus probbaly harvesting a bunch of info on me for the purposes of selling me stuff.
+I got tired of goodreads and how a) poor their interface was, b) how every book was three stars because of the amount of people (and bots) on the platform, and c) how it was tied to Amazon, and thus probabaly harvesting a bunch of info on me for the purposes of selling me stuff.
 
-So I designed to take matters into my own hands after other competitors proved lacking in functionality. So welcome to Seshat.
+So I designed to take matters into my own hands after other competitors proved lacking in functionality. Welcome to Seshat.
 
 ## What's in a Name?
 
@@ -12,7 +12,7 @@ Seshat is the Egyptian deity responsible for wisdom, knowledge, and writing. And
 
 ## Implementation
 
-The backend is managed in Python (Flask), and connected to a SQLite DB on the user's local machine. See Installing the Alpha seciton for more. On the front end, this is written in Bootstrap, but there is some motivation to moving to React, Angular, or Vue.
+The backend is managed in Python (Flask), and connected to a SQLite DB on the user's local machine. See Installing the Alpha section for more. On the front end, Seshat is written in Bootstrap, but there is some motivation to move to React, Angular, or Vue.
 
 ## Installing the Alpha
 

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from seshat import db, login_manager
 from flask_login import UserMixin
 
@@ -9,7 +11,8 @@ def load_user(user_id):
 
 book_ownership = db.Table('ownership',
                           db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-                          db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+                          db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
+                          db.Column('date_added', db.DateTime, nullable=False, default=datetime.utcnow())
                           )
 
 
