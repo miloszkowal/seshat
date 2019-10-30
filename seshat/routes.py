@@ -145,9 +145,8 @@ def additional_stats():
 @login_required
 def my_books():
     title = 'My Books'
-    count = Book.query.join(User.books).filter(User.id == current_user.id).count()
     user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
-    return render_template('my_books.html', title=title, books=user_books, count=count)
+    return render_template('my_books.html', title=title, books=user_books, count=len(user_books))
 
 
 @app.route('/account/delete_account', methods=['POST'])

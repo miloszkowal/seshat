@@ -30,7 +30,8 @@ As it stands, you can do the following:
 
 * Register as a new user
 * Login in as an existing user (including any users you create)
-* Add Books to the DB (and also to your account)
+* Add Books to the DB (and also to your account) and remove books from your account
+* Make changes to your account (including changing your profile picture and deleting the account)
 
 ## Adding Issues
 
