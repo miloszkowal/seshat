@@ -156,8 +156,8 @@ def delete_account():
 
 @app.route('/book/<int:book_id>')
 def book(book_id):
-    title = 'Book'
-    return render_template('book.html', title=title)
+    book = Book.query.get(book_id)
+    return render_template('book.html', title=book.title, book=book)
 
 
 @app.route('/book/<int:book_id>/delete', methods=['POST'])
