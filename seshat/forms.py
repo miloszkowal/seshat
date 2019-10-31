@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
 from wtforms import StringField, PasswordField, SubmitField, BooleanField
-from wtforms.validators import InputRequired, Length, Email, EqualTo, ValidationError
+from wtforms.validators import InputRequired, Length, Email, EqualTo, ValidationError, Optional
 from seshat.models import User
 
 
@@ -25,8 +25,8 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email')
-    password = PasswordField('Password')
+    email = StringField('Email', validators=[InputRequired()])
+    password = PasswordField('Password', validators=[InputRequired()])
     remember = BooleanField('Remember Me')
     login = SubmitField('Login')
 
@@ -38,15 +38,25 @@ class BookForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    title = StringField('Title')
-    author = StringField('Author')
+    title = StringField('Title', validators=[Optional()])
+    author = StringField('Author', validators=[Optional()])
     submit = SubmitField('Search')
+
+    def validate(self):
+        if not super(SearchForm, self).validate():
+            return False
+        if not self.title.data or self.author.data:
+            msg = 'At least one of title or author must be filled in.'
+            self.title.errors.append(msg)
+            self.author.errors.append(msg)
+            return False
+        return True
 
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)])
     email = StringField('email', validators=[InputRequired(), Email()])
-    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png'])])
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     submit = SubmitField('Update')
 
     def validate_username(self, username):

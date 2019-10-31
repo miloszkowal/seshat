@@ -7,7 +7,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 
 from sqlalchemy.exc import IntegrityError
 
-from seshat.forms import BookForm, RegistrationForm, LoginForm, UpdateAccountForm
+from seshat.forms import BookForm, RegistrationForm, LoginForm, UpdateAccountForm, SearchForm
 from seshat.models import User, Book
 from seshat import app, db, bcrypt
 
@@ -72,7 +72,7 @@ def add_book():
                 flash(str(add_book_form.title.data) + ' added to your account!', 'success')
             except IntegrityError:
                 flash('Book already in your account!', 'warning')
-            except:
+            except:  # TODO: Remove this later, as it is not PEP8 compliant.
                 flash('An unknown error occurred. Please try again later.', 'danger')
         else:
             book = Book(title=add_book_form.title.data, author=add_book_form.author.data)
@@ -99,9 +99,12 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
-@app.route('/search')
+@app.route('/search', methods=['GET', 'POST'])
 def search():
-    return render_template('search.html', title='Search')
+    search_form = SearchForm()
+    if search_form.validate_on_submit():
+        flash('test', 'success')
+    return render_template('search.html', title='Search', form=search_form)
 
 
 def save_picture(form_picture):
@@ -116,7 +119,7 @@ def save_picture(form_picture):
     return picture_fn
 
 
-@app.route('/account_settings')
+@app.route('/account_settings', methods=['GET', 'POST'])
 @login_required
 def account_settings():
     update_account_form = UpdateAccountForm()
@@ -138,7 +141,8 @@ def account_settings():
 @app.route('/additional_stats')
 @login_required
 def additional_stats():
-    return render_template('additional_stats.html')
+    title = 'Additional Stats'
+    return render_template('additional_stats.html', title=title)
 
 
 @app.route('/my_books')
