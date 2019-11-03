@@ -21,7 +21,7 @@ The backend is managed in Python (Flask), and connected to a SQLite DB on the us
 3. Ensure you have a virtual environment running
 4. Run `pip install -r requirements.txt`
 5. Run the app by running `python main.py` This should run a flask server on localhost:5000
-5. In your browser, go to localhost:5000. Congratulations! You're running the alpha
+5. Congratulations! You're running the alpha
 
 ## Navigating the Alpha
 

@@ -79,7 +79,7 @@ def add_book():
             book.owners.append(current_user)
             db.session.add(book)
             flash(str(add_book_form.title.data) + ' successfully added to DB!', 'success')
-        return redirect(url_for('home'))
+        return redirect(url_for('my_books'))
     return render_template('add_book.html', title='Add A Book', form=add_book_form)
 
 
