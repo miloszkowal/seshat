@@ -7,7 +7,7 @@ from seshat.models import User
 
 
 class RegistrationForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)])
+    username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)], render_kw={'autofocus': True})
     email = StringField('email', validators=[InputRequired(), Email()])
     password = PasswordField('Password', validators=[InputRequired()])
     confirm_password = PasswordField('Confirm Password', validators=[EqualTo('password', message='Passwords must match.')])
@@ -25,20 +25,20 @@ class RegistrationForm(FlaskForm):
 
 
 class LoginForm(FlaskForm):
-    email = StringField('Email', validators=[InputRequired()])
+    email = StringField('Email', validators=[InputRequired()], render_kw={'autofocus': True})
     password = PasswordField('Password', validators=[InputRequired()])
     remember = BooleanField('Remember Me')
     login = SubmitField('Login')
 
 
 class BookForm(FlaskForm):
-    title = StringField('Title', validators=[InputRequired()])
+    title = StringField('Title', validators=[InputRequired()], render_kw={'autofocus': True})
     author = StringField('Author', validators=[InputRequired()])
     submit = SubmitField('Add Book')
 
 
 class SearchForm(FlaskForm):
-    title = StringField('Title', validators=[Optional()])
+    title = StringField('Title', validators=[Optional()], render_kw={'autofocus': True})
     author = StringField('Author', validators=[Optional()])
     submit = SubmitField('Search')
 
@@ -54,7 +54,7 @@ class SearchForm(FlaskForm):
 
 
 class UpdateAccountForm(FlaskForm):
-    username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)])
+    username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)], render_kw={'autofocus': True})
     email = StringField('email', validators=[InputRequired(), Email()])
     picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg', 'png', 'jpeg'])])
     submit = SubmitField('Update')
