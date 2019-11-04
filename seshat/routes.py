@@ -1,8 +1,9 @@
 import os
 import secrets
+from datetime import datetime
 
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, abort
+from flask import render_template, url_for, flash, redirect, request, g
 from flask_login import login_user, logout_user, current_user, login_required
 
 from sqlalchemy.exc import IntegrityError
@@ -99,12 +100,28 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
+@app.before_request
+def before_request():
+    if current_user.is_authenticated:
+        current_user.last_seen = datetime.utcnow()
+        db.session.commit()
+        g.search_form = SearchForm()
+    # g.locale = str(get_locale())
+
+
 @app.route('/search', methods=['GET', 'POST'])
 def search():
-    search_form = SearchForm()
-    if search_form.validate_on_submit():
-        flash('test', 'success')
-    return render_template('search.html', title='Search', form=search_form)
+    if not g.search_form.validate():
+        return redirect(url_for('home'))
+    page = request.args.get('page', 1, type=int)
+    posts, total = Book.search(g.search_form.q.data, page,
+                               app.config['BOOKS_PER_PAGE'])
+    next_url = url_for('search', q=g.search_form.q.data, page=page + 1) \
+        if total > page * app.config['POSTS_PER_PAGE'] else None
+    prev_url = url_for('search', q=g.search_form.q.data, page=page - 1) \
+        if page > 1 else None
+    return render_template('search.html', title='Search', posts=posts,
+                           next_url=next_url, prev_url=prev_url)
 
 
 def save_picture(form_picture):

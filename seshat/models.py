@@ -65,6 +65,7 @@ book_ownership = db.Table('ownership',
 
 
 class User(db.Model, UserMixin):
+    __searchable__ = ['username', 'email']
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -76,8 +77,8 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}')"
 
 
-class Book(db.Model):
-    __searchable__ = ['title', 'author']
+class Book(SearchableMixin, db.Model):
+    __searchable__ = ['title', 'author', 'isbn']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     author = db.Column(db.String(100), nullable=False)

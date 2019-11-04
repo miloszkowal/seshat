@@ -1,3 +1,4 @@
+from flask import request
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
@@ -38,9 +39,14 @@ class BookForm(FlaskForm):
 
 
 class SearchForm(FlaskForm):
-    title = StringField('Title', validators=[Optional()], render_kw={'autofocus': True})
-    author = StringField('Author', validators=[Optional()])
-    submit = SubmitField('Search')
+    q = StringField('Search', validators=[InputRequired()])
+
+    def __init__(self, *args, **kwargs):
+        if 'formdata' not in kwargs:
+            kwargs['formdata'] = request.args
+        if 'csrf_enabled' not in kwargs:
+            kwargs['csrf_enabled'] = False
+        super(SearchForm, self).__init__(*args, **kwargs)
 
     def validate(self):
         if not super(SearchForm, self).validate():
