@@ -28,4 +28,4 @@ admin = Admin(app)
 admin.add_view(ModelView(User, db.session))
 admin.add_view(ModelView(Book, db.session))
 
-from seshat import routes
+from seshat import routes, errors

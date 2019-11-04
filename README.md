@@ -1,10 +1,8 @@
-# Seshat: A Book Manager that Doesn't Suck
+# Seshat: A New Book Manager
 
 ## Introduction
 
-I got tired of goodreads and how a) poor their interface was, b) how every book was three stars because of the amount of people (and bots) on the platform, and c) how it was tied to Amazon, and thus probabaly harvesting a bunch of info on me for the purposes of selling me stuff.
-
-So I designed to take matters into my own hands after other competitors proved lacking in functionality. Welcome to Seshat.
+Seshat was built from the ground up to be a response to the current book manager scene, which is dominated by Goodreads. It's designed with the user in mind, giving you full control over your books, collections, and friends (coming soon). It features a slick and adaptive user interface, a gorgeous way to interact with your books, and reading goals to keep you reading and growing your library. You have to see it to believe it.
 
 ## What's in a Name?
 
