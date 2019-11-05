@@ -1,8 +1,12 @@
 from elasticsearch import Elasticsearch
 
 from flask import Flask
+
 from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
+
 from flask_bcrypt import Bcrypt
+
 from flask_login import LoginManager
 
 from flask_admin import Admin
@@ -19,6 +23,7 @@ app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
     if app.config['ELASTICSEARCH_URL'] else None
 
 db = SQLAlchemy(app)
+migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
