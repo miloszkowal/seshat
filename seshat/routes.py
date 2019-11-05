@@ -17,10 +17,7 @@ from seshat import app, db, bcrypt
 @app.route('/home')
 def home():
     books = Book.query.all()
-    if current_user.is_authenticated:
-        return redirect(url_for('account'))
-    else:
-        return render_template('home.html', books=books)
+    return render_template('home.html', books=books)
 
 
 @app.route('/about')
@@ -52,7 +49,7 @@ def login():
         user = User.query.filter_by(email=login_form.email.data).first()
         if user and bcrypt.check_password_hash(user.password, login_form.password.data):
             login_user(user, remember=login_form.remember.data)
-            return redirect(url_for('home'))
+            return redirect(url_for('account'))
         else:
             flash('Invalid email or password.', 'danger')
     return render_template('login.html', title='Login', form=login_form)
@@ -78,6 +75,7 @@ def add_book():
             book.owners.append(current_user)
             db.session.add(book)
             flash(str(add_book_form.title.data) + ' successfully added to DB!', 'success')
+            db.session.commit()
         return redirect(url_for('my_books'))
     return render_template('add_book.html', title='Add A Book', form=add_book_form)
 
@@ -98,13 +96,13 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
-@app.before_request
-def before_request():
-    if current_user.is_authenticated:
-        current_user.last_seen = datetime.utcnow()
-        db.session.commit()
-        g.search_form = SearchForm()
-    # g.locale = str(get_locale())
+# @app.before_request
+# def before_request():
+#     if current_user.is_authenticated:
+#         current_user.last_seen = datetime.utcnow()
+#         db.session.commit()
+#         g.search_form = SearchForm()
+#     # g.locale = str(get_locale())
 
 
 @app.route('/search', methods=['GET', 'POST'])
