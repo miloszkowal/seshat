@@ -57,6 +57,10 @@ book_ownership = db.Table('ownership',
                           db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
                           db.Column('date_added', db.DateTime, nullable=False, default=datetime.utcnow())
                           )
+ownership = db.Table('ownership',
+                     db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
+                     db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+                     )
 
 
 # TODO: add association table for book tagging
@@ -73,6 +77,7 @@ class User(db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     books = db.relationship('Book', secondary=book_ownership, lazy='subquery', backref=db.backref('owners', lazy='dynamic'))
     is_admin = db.Column(db.Integer, default=0)
+    books = db.relationship('Book', secondary=ownership, lazy='subquery', backref=db.backref('owners', lazy='dynamic'))
 
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
@@ -85,6 +90,7 @@ class Book(SearchableMixin, db.Model):
     author = db.Column(db.String(100), nullable=False)
     num_pages = db.Column(db.Integer)
     isbn = db.Column(db.String(100))
+    cover_image = db.Column(db.String(20), nullable=False, default='default_book.png')
 
     def __repr__(self):
         return f"Book('{self.title}',' by {self.author}')"
