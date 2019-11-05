@@ -23,7 +23,7 @@ The backend is managed in Python (Flask), and connected to a SQLite DB on the us
 
 ## Navigating the Alpha
 
-Two users currently exist: `test_user@seshatapp.io` and `test_user2@seshatapp.io`. Both have passwords of `password`. Currently, there are three books in the database: all three of Edmund Morris' books on Theodore Roosevelt.
+Currently, there are three books in the database: all three of Edmund Morris' books on Theodore Roosevelt.
 As it stands, you can do the following:
 
 * Register as a new user
