@@ -12,11 +12,11 @@ from flask_login import LoginManager
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
+from seshat.config import Config
+
 
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'bcdca3e428f8eadc6d04761ceace3204'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///site.db'
-app.config['ELASTICSEARCH_URL'] = 'http://localhost:9200'
+app.config.from_object(Config)
 
 
 app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
