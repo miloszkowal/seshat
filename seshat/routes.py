@@ -162,7 +162,8 @@ def additional_stats():
 @login_required
 def my_books():
     title = 'My Books'
-    user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
+    user_books = current_user.books
+    # user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
     return render_template('my_books.html', title=title, books=user_books, count=len(user_books))
 
 
@@ -178,7 +179,8 @@ def delete_account():
 @app.route('/book/<int:book_id>')
 def book(book_id):
     book = Book.query.get(book_id)
-    return render_template('book.html', title=book.title, book=book)
+    owner_count = len(book.owners.all())
+    return render_template('book.html', count=owner_count, title=book.title, book=book)
 
 
 @app.route('/book/<int:book_id>/delete', methods=['POST'])
