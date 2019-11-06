@@ -7,9 +7,9 @@ from flask_migrate import Migrate
 
 from flask_bcrypt import Bcrypt
 
-from flask_login import LoginManager
+from flask_login import LoginManager, current_user
 
-from flask_admin import Admin
+from flask_admin import Admin, BaseView
 from flask_admin.contrib.sqla import ModelView
 
 from seshat.config import Config
@@ -28,9 +28,5 @@ bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
 from seshat.models import User, Book
-
-admin = Admin(app)
-admin.add_view(ModelView(User, db.session))
-admin.add_view(ModelView(Book, db.session))
 
 from seshat import routes, errors
