@@ -1,1 +1,1 @@
-web: flask db upgrade; gunicorn seshatbooks:app
+web: flask db upgrade; gunicorn main:app
