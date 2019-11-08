@@ -5,6 +5,9 @@
             <li class="list-group-item list-group-item-light"><a href="{{ url_for('my_books') }}">My Books</a></li>
             <li class="list-group-item list-group-item-light"><a href="{{ url_for('additional_stats') }}">Additional Stats</a></li>
             <li class="list-group-item list-group-item-light"><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+            {% if current_user.is_admin == 1 %}
+            <li class="list-group-item list-group-item-light"><a href="/admin">DB Admin Panel</a></li>
+            {% endif %}
         </ul>
       </div>
 </div>

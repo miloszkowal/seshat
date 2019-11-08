@@ -7,14 +7,6 @@
         <img src="{{ url_for('static', filename='book_covers/' + book.cover_image) }}">
     </div>
     <p>Read by {{ count }} people</p>
+    <a href="https://www.amazon.com/s?k={{ book.title }}">Find it on Amazon here</a>
 </div>
 {% endblock content %}
-{% block sidebar %}
-{% if current_user.is_admin == 1%}
-<div class="col-md-4">
-<div class="content-section">
-    <h1>Admin Sidebar</h1>
-</div>
-</div>
-{% endif %}
-{% endblock sidebar %}

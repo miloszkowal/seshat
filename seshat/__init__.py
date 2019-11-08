@@ -9,7 +9,9 @@ from flask_bcrypt import Bcrypt
 
 from flask_login import LoginManager, current_user
 
-from flask_admin import Admin, BaseView
+from flask_mail import Mail
+
+from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 
 from seshat.config import Config
@@ -27,6 +29,22 @@ migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
-from seshat.models import User, Book
+from seshat.models import User, Book, load_user
+
+mail = Mail(app)
+
+admin = Admin(app)
+
+
+class NewModelView(ModelView):
+    def is_accessible(self):
+        try:
+            return current_user.is_admin == 1 and not current_user.is_anonymous
+        except AttributeError:
+            return False
+
+
+admin.add_view(NewModelView(User, db.session))
+admin.add_view(NewModelView(Book, db.session))
 
 from seshat import routes, errors
