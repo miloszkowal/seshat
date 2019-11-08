@@ -8,8 +8,10 @@ from flask_login import login_user, logout_user, current_user, login_required
 
 from sqlalchemy.exc import IntegrityError
 
-from seshat.forms import BookForm, RegistrationForm, LoginForm, UpdateAccountForm, SearchForm
+from seshat.forms import (BookForm, RegistrationForm, LoginForm,
+                          UpdateAccountForm, SearchForm, ResetPasswordRequestForm, ResetPasswordForm)
 from seshat.models import User, Book
+from seshat.email import send_password_reset_email
 from seshat import app, db, bcrypt
 
 
@@ -47,7 +49,7 @@ def login():
     login_form = LoginForm()
     if login_form.validate_on_submit():
         user = User.query.filter_by(email=login_form.email.data).first()
-        if user and bcrypt.check_password_hash(user.password, login_form.password.data):
+        if user and user.check_password(login_form.password.data):
             login_user(user, remember=login_form.remember.data)
             return redirect(url_for('account'))
         else:
@@ -163,7 +165,6 @@ def additional_stats():
 def my_books():
     title = 'My Books'
     user_books = current_user.books
-    # user_books = Book.query.join(User.books).filter(User.id == current_user.id).all()
     return render_template('my_books.html', title=title, books=user_books, count=len(user_books))
 
 
@@ -190,3 +191,34 @@ def delete_book(book_id):
     current_user.books.remove(book_to_delete)
     db.session.commit()
     return redirect(url_for('my_books'))
+
+
+@app.route('/reset_password_request', methods=['GET', 'POST'])
+def reset_password_request():
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    reset_password_request_form = ResetPasswordRequestForm()
+    if reset_password_request_form.validate_on_submit():
+        user = User.query.filter_by(email=reset_password_request_form.email.data).first()
+        if user:
+            send_password_reset_email(user)
+            flash('Check your email for the instructions to reset your password', 'info')
+            return redirect(url_for('login'))
+    return render_template('reset_password_request.html', title='Reset Password', form=reset_password_request_form)
+
+
+@app.route('/reset_password/<token>', methods=['GET', 'POST'])
+def reset_password(token):
+    if current_user.is_authenticated:
+        return redirect(url_for('home'))
+    user = User.verify_reset_password_token(token)
+    if not user:
+        flash('This token is invalid or expired.', 'danger')
+        return redirect(url_for('home'))
+    reset_password_form = ResetPasswordForm()
+    if reset_password_form.validate_on_submit():
+        user.set_password(reset_password_form.password.data)
+        db.session.commit()
+        flash('Your password has been reset!', 'success')
+        return redirect(url_for('login'))
+    return render_template('reset_password.html', title='Reset Password', form=reset_password_form)

@@ -1,7 +1,8 @@
-from datetime import datetime
+from time import time
+import jwt
 from flask_login import UserMixin
 
-from seshat import db, login_manager
+from seshat import db, login_manager, app, bcrypt
 from seshat.search import add_to_index, remove_from_index, query_index
 
 
@@ -73,6 +74,26 @@ class User(db.Model, UserMixin):
     is_admin = db.Column(db.Integer, default=0)
     books = db.relationship('Book', secondary=ownership, lazy='subquery', backref=db.backref('owners', lazy='dynamic'))
 
+    def set_password(self, password):
+        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+
+    def check_password(self, password):
+        return bcrypt.check_password_hash(self.password, password)
+
+    def get_reset_password_token(self, expires_in=600):
+        return jwt.encode(
+            {'reset_password': self.id, 'exp': time() + expires_in},
+            app.config['SECRET_KEY'], algorithm='HS256').decode('utf-8')
+
+    @staticmethod
+    def verify_reset_password_token(token):
+        try:
+            id = jwt.decode(token, app.config['SECRET_KEY'],
+                            algorithms=['HS256'])['reset_password']
+        except:
+            return
+        return User.query.get(id)
+
     def __repr__(self):
         return f"User('{self.username}', '{self.email}')"
 
@@ -84,6 +105,7 @@ class Book(db.Model):
     author = db.Column(db.String(100), nullable=False)
     num_pages = db.Column(db.Integer)
     isbn = db.Column(db.String(100))
+    # isbn_13 = db.Column(db.String(20))
     cover_image = db.Column(db.String(20), nullable=False, default='default_book.png')
 
     def __repr__(self):
