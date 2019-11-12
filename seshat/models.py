@@ -60,15 +60,20 @@ ownership = db.Table('ownership',
                      db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
                      )
 
-# book_subject =
+authorship = db.Table('authorship',
+                      db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
+                      db.Column('author_id', db.Integer, db.ForeignKey('author.id'), primary_key=True)
+                      )
+
+book_subject = db.Table('book_subject',
+                        db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
+                        db.Column('subject_id', db.Integer, db.ForeignKey('subject.id'), primary_key=True)
+                        )
 
 
 # TODO: add association table for book tagging
 # tags = db.Table('tags',
 #     db.Column())
-
-class Address(db.Model):
-    pass
 
 
 class User(db.Model, UserMixin):
@@ -106,55 +111,86 @@ class User(db.Model, UserMixin):
 
 
 class Book(db.Model):
-    __searchable__ = ['title', 'author', 'isbn']
+    __searchable__ = ['title', 'isbn']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
-    author = db.Column(db.String(100), nullable=False)
     num_pages = db.Column(db.Integer)
     isbn = db.Column(db.String(100))
     isbn_13 = db.Column(db.String(20))
-    publisher = db.Column(db.Integer)
-    # publish_date = db.Column() Here be datetiem
-    language = db.Column(db.Integer)
-    # msrp = db.Column()
+    publish_date = db.Column(db.DateTime)
+    genre_id = db.Column(db.Integer, db.ForeignKey('genre.id'))
+    publisher_id = db.Column(db.Integer, db.ForeignKey('publisher.id'))
+    language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
+    msrp = db.Column(db.Float)
     cover_image = db.Column(db.String(20), nullable=False, default='default_book.png')
 
     def __repr__(self):
-        return f"Book('{self.title}',' by {self.author}')"
-
-    def __str__(self):
-        return f"Book('{self.title}',' by {self.author}')"
+        return f"<Book('{self.title}')>"
 
 
 class Genre(db.Model):
-    __tablename__ = 'Genre'
     __searchable__ = ['genre']
     id = db.Column(db.Integer, primary_key=True)
     genre = db.Column(db.String(50), nullable=False)
+    books = db.relationship('Book', backref='genre', lazy=True)
+
+
+class Author(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+    birth_date = db.Column(db.DateTime)
+    death_date = db.Column(db.DateTime)
+    books = db.relationship('Book', secondary=authorship, lazy='subquery', backref=db.backref('authors', lazy='dynamic'))
+
+    def __repr__(self):
+        return f"<Author({self.first_name} {self.last_name})>"
+
+    def __str__(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 class Publisher(db.Model):
-    __tablename__ = 'Publisher'
+    __searchable__ = ['org_name']
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
-    # address = This will with an address table
+    org_name = db.Column(db.String(100), nullable=False)
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'))
     wiki_link = db.Column(db.String())
     website = db.Column(db.String())
-    # founded = Here be datetime
+    founded = db.Column(db.DateTime)
+    books = db.relationship('Book', backref='publisher', lazy=True)
+
 
 class Language(db.Model):
     """
     Table for languages in ISO 639-1 Format
     """
-    __tablename__ = "Language"
     id = db.Column(db.Integer, primary_key=True)
-    lang_code = db.Column(db.String(5), nullable=False)
-    lang_long = db.Column(db.String(35))
+    lang = db.Column(db.String(5), nullable=False)
+    culture = db.Column(db.String(35))
+    lang_code = db.Column(db.String(5))
+    lang_name = db.Column(db.String(35))
+    books = db.relationship('Book', backref='language', lazy=True)
+
 
 class Subject(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     subject = db.Column(db.String(50), nullable=False)
+    books = db.relationship('Book', secondary=book_subject, lazy='subquery', backref=db.backref('subjects', lazy='dynamic'))
 
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.String(100), nullable=False)
+
+
+class Address(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    country = db.Column(db.String(5))  # Country
+    admin_area = db.Column(db.String(20))  # State / Province / Region / Oblast / etc.
+    sub_admin_area = db.Column(db.String(20))
+    locality = db.Column(db.String(50))  # City / Town
+    postal_code = db.Column(db.String(20))
+    thoroughfare = db.Column(db.String(25))  # Street Address
+    premise = db.Column(db.String(50))  # Apartment / Suite / etc.
+    publisher = db.relationship('Publisher', backref='address', lazy=True)
