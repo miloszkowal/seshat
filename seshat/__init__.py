@@ -1,19 +1,12 @@
 from elasticsearch import Elasticsearch
-
 from flask import Flask
-
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-
 from flask_bcrypt import Bcrypt
-
 from flask_login import LoginManager, current_user
-
 from flask_mail import Mail
-
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
-
 from seshat.config import Config
 
 
@@ -29,7 +22,7 @@ migrate = Migrate(app, db)
 bcrypt = Bcrypt(app)
 login_manager = LoginManager(app)
 
-from seshat.models import User, Book, load_user
+from seshat.models import User, Book, Author, load_user
 
 mail = Mail(app)
 
@@ -46,5 +39,6 @@ class NewModelView(ModelView):
 
 admin.add_view(NewModelView(User, db.session))
 admin.add_view(NewModelView(Book, db.session))
+admin.add_view(NewModelView(Author, db.session))
 
 from seshat import routes, errors
