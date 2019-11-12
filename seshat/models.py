@@ -1,4 +1,6 @@
 from time import time
+from datetime import datetime
+
 import jwt
 from flask_login import UserMixin
 
@@ -58,10 +60,15 @@ ownership = db.Table('ownership',
                      db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
                      )
 
+# book_subject =
+
 
 # TODO: add association table for book tagging
 # tags = db.Table('tags',
 #     db.Column())
+
+class Address(db.Model):
+    pass
 
 
 class User(db.Model, UserMixin):
@@ -105,7 +112,11 @@ class Book(db.Model):
     author = db.Column(db.String(100), nullable=False)
     num_pages = db.Column(db.Integer)
     isbn = db.Column(db.String(100))
-    # isbn_13 = db.Column(db.String(20))
+    isbn_13 = db.Column(db.String(20))
+    publisher = db.Column(db.Integer)
+    # publish_date = db.Column() Here be datetiem
+    language = db.Column(db.Integer)
+    # msrp = db.Column()
     cover_image = db.Column(db.String(20), nullable=False, default='default_book.png')
 
     def __repr__(self):
@@ -113,6 +124,35 @@ class Book(db.Model):
 
     def __str__(self):
         return f"Book('{self.title}',' by {self.author}')"
+
+
+class Genre(db.Model):
+    __tablename__ = 'Genre'
+    __searchable__ = ['genre']
+    id = db.Column(db.Integer, primary_key=True)
+    genre = db.Column(db.String(50), nullable=False)
+
+class Publisher(db.Model):
+    __tablename__ = 'Publisher'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    # address = This will with an address table
+    wiki_link = db.Column(db.String())
+    website = db.Column(db.String())
+    # founded = Here be datetime
+
+class Language(db.Model):
+    """
+    Table for languages in ISO 639-1 Format
+    """
+    __tablename__ = "Language"
+    id = db.Column(db.Integer, primary_key=True)
+    lang_code = db.Column(db.String(5), nullable=False)
+    lang_long = db.Column(db.String(35))
+
+class Subject(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    subject = db.Column(db.String(50), nullable=False)
 
 
 class Tag(db.Model):

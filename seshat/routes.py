@@ -122,12 +122,19 @@ def search():
                            next_url=next_url, prev_url=prev_url)
 
 
-def save_picture(form_picture):
+def save_picture(form_picture, _type):
+    """
+    Saves a picture to the file system
+    """
     random_hex = secrets.token_hex(8)
     _, ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + ext
-    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
-    output_size = (125, 125)
+    if _type == 'account':
+        picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+        output_size = (125, 125)
+    elif _type == 'book':
+        picture_path = os.path.join(app.root_path, 'static/book_covers', picture_fn)
+        output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
     i.save(picture_path)
@@ -140,7 +147,7 @@ def account_settings():
     update_account_form = UpdateAccountForm()
     if update_account_form.validate_on_submit():
         if update_account_form.picture.data:
-            picture_file = save_picture(update_account_form.picture.data)
+            picture_file = save_picture(update_account_form.picture.data, _type="account")
             current_user.profile_pic = picture_file
         current_user.username = update_account_form.username.data
         current_user.email = update_account_form.email.data
