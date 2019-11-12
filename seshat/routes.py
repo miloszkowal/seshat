@@ -10,7 +10,7 @@ from sqlalchemy.exc import IntegrityError
 
 from seshat.forms import (BookForm, RegistrationForm, LoginForm,
                           UpdateAccountForm, SearchForm, ResetPasswordRequestForm, ResetPasswordForm)
-from seshat.models import User, Book
+from seshat.models import User, Book, Author
 from seshat.email import send_password_reset_email
 from seshat import app, db, bcrypt
 
@@ -18,8 +18,8 @@ from seshat import app, db, bcrypt
 @app.route('/')
 @app.route('/home')
 def home():
-    books = Book.query.all()
-    return render_template('home.html', books=books)
+    #books = Book.query.all()
+    return render_template('home.html', books=[])
 
 
 @app.route('/about')
@@ -73,8 +73,12 @@ def add_book():
             except:  # TODO: Remove this later, as it is not PEP8 compliant.
                 flash('An unknown error occurred. Please try again later.', 'danger')
         else:
-            book = Book(title=add_book_form.title.data, author=add_book_form.author.data)
+            book = Book(title=add_book_form.title.data)
+            split_name = add_book_form.author.data.split()
+            author = Author(first_name=split_name[0], last_name=split_name[1])
+            book.authors.append(author)
             book.owners.append(current_user)
+            db.session.add(author)
             db.session.add(book)
             flash(str(add_book_form.title.data) + ' successfully added to DB!', 'success')
             db.session.commit()
@@ -229,3 +233,9 @@ def reset_password(token):
         flash('Your password has been reset!', 'success')
         return redirect(url_for('login'))
     return render_template('reset_password.html', title='Reset Password', form=reset_password_form)
+
+
+@app.route('/author/<int:author_id>')
+def author(author_id):
+    author = Author.query.get_or_404(author_id)
+    return render_template('author.html', title=author.first_name, author=author)
