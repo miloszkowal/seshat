@@ -143,6 +143,10 @@ class Author(db.Model):
     death_date = db.Column(db.DateTime)
     books = db.relationship('Book', secondary=authorship, lazy='subquery', backref=db.backref('authors', lazy='dynamic'))
 
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
     def __repr__(self):
         return f"<Author({self.first_name} {self.last_name})>"
 
