@@ -128,3 +128,5 @@ dmypy.json
 .DS_Store
 seshat/site.db
 site.db
+seshat/site.db
+*.db
