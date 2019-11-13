@@ -80,11 +80,17 @@ class User(db.Model, UserMixin):
     __searchable__ = ['username', 'email']
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
+    first_name = db.Column(db.String(50))
+    last_name = db.Column(db.String(50))
     email = db.Column(db.String(120), unique=True, nullable=False)
     profile_pic = db.Column(db.String(20), nullable=False, default='default.jpg')
     password = db.Column(db.String(60), nullable=False)
     is_admin = db.Column(db.Integer, default=0)
     books = db.relationship('Book', secondary=ownership, lazy='subquery', backref=db.backref('owners', lazy='dynamic'))
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
 
     def set_password(self, password):
         self.password = bcrypt.generate_password_hash(password).decode('utf-8')
