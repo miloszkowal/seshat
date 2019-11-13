@@ -4,8 +4,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
     DEBUG = os.environ.get('DEBUG')
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'app.db')
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(basedir, 'site.db')
     SECRET_KEY = 'bcdca3e428f8eadc6d04761ceace3204'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     ELASTICSEARCH_URL = 'http://localhost:9200'
