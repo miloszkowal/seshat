@@ -14,47 +14,47 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 
-# class SearchableMixin(object):
-#     @classmethod
-#     def search(cls, expression, page, per_page):
-#         ids, total = query_index(cls.__tablename__, expression, page, per_page)
-#         if total == 0:
-#             return cls.query.filter_by(id=0), 0
-#         when = []
-#         for i in range(len(ids)):
-#             when.append((ids[i], i))
-#         return cls.query.filter(cls.id.in_(ids)).order_by(
-#             db.case(when, value=cls.id)), total
+class SearchableMixin(object):
+    @classmethod
+    def search(cls, expression, page, per_page):
+        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+        if total == 0:
+            return cls.query.filter_by(id=0), 0
+        when = []
+        for i in range(len(ids)):
+            when.append((ids[i], i))
+        return cls.query.filter(cls.id.in_(ids)).order_by(
+            db.case(when, value=cls.id)), total
 
-#     @classmethod
-#     def before_commit(cls, session):
-#         session._changes = {
-#             'add': list(session.new),
-#             'update': list(session.dirty),
-#             'delete': list(session.deleted)
-#         }
+    @classmethod
+    def before_commit(cls, session):
+        session._changes = {
+            'add': list(session.new),
+            'update': list(session.dirty),
+            'delete': list(session.deleted)
+        }
 
-#     @classmethod
-#     def after_commit(cls, session):
-#         for obj in session._changes['add']:
-#             if isinstance(obj, SearchableMixin):
-#                 add_to_index(obj.__tablename__, obj)
-#         for obj in session._changes['update']:
-#             if isinstance(obj, SearchableMixin):
-#                 add_to_index(obj.__tablename__, obj)
-#         for obj in session._changes['delete']:
-#             if isinstance(obj, SearchableMixin):
-#                 remove_from_index(obj.__tablename__, obj)
-#         session._changes = None
+    @classmethod
+    def after_commit(cls, session):
+        for obj in session._changes['add']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['update']:
+            if isinstance(obj, SearchableMixin):
+                add_to_index(obj.__tablename__, obj)
+        for obj in session._changes['delete']:
+            if isinstance(obj, SearchableMixin):
+                remove_from_index(obj.__tablename__, obj)
+        session._changes = None
 
-#     @classmethod
-#     def reindex(cls):
-#         for obj in cls.query:
-#             add_to_index(cls.__tablename__, obj)
+    @classmethod
+    def reindex(cls):
+        for obj in cls.query:
+            add_to_index(cls.__tablename__, obj)
 
 
-# db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-# db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+db.event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
+db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
 
 ownership = db.Table('ownership',
                      db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
@@ -77,8 +77,8 @@ book_subject = db.Table('book_subject',
 #     db.Column())
 
 
-class User(db.Model, UserMixin):
-    __searchable__ = ['username', 'email']
+class User(SearchableMixin, db.Model, UserMixin):
+    __searchable__ = ['username', 'email', 'first_name', 'last_name']
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(20), unique=True, nullable=False)
     first_name = db.Column(db.String(50))
@@ -117,8 +117,8 @@ class User(db.Model, UserMixin):
         return f"User('{self.username}', '{self.email}')"
 
 
-class Book(db.Model):
-    __searchable__ = ['title', 'isbn']
+class Book(SearchableMixin, db.Model):
+    __searchable__ = ['title', 'isbn', 'isbn_13']
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(100), nullable=False)
     num_pages = db.Column(db.Integer)
@@ -135,14 +135,15 @@ class Book(db.Model):
         return f"<Book('{self.title}')>"
 
 
-class Genre(db.Model):
+class Genre(SearchableMixin, db.Model):
     __searchable__ = ['genre']
     id = db.Column(db.Integer, primary_key=True)
     genre = db.Column(db.String(50), nullable=False)
     books = db.relationship('Book', backref='genre', lazy=True)
 
 
-class Author(db.Model):
+class Author(SearchableMixin, db.Model):
+    __searchable__ = ['first_name', 'last_name']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
     last_name = db.Column(db.String(50), nullable=False)
@@ -161,7 +162,7 @@ class Author(db.Model):
         return f"{self.first_name} {self.last_name}"
 
 
-class Publisher(db.Model):
+class Publisher(SearchableMixin, db.Model):
     __searchable__ = ['org_name']
     id = db.Column(db.Integer, primary_key=True)
     org_name = db.Column(db.String(100), nullable=False)

@@ -23,16 +23,6 @@ class SearchForm(FlaskForm):
             kwargs['csrf_enabled'] = False
         super(SearchForm, self).__init__(*args, **kwargs)
 
-    def validate(self):
-        if not super(SearchForm, self).validate():
-            return False
-        if not self.title.data or self.author.data:
-            msg = 'At least one of title or author must be filled in.'
-            self.title.errors.append(msg)
-            self.author.errors.append(msg)
-            return False
-        return True
-
 
 class UpdateAccountForm(FlaskForm):
     username = StringField('Username', validators=[InputRequired(), Length(min=2, max=20)], render_kw={'autofocus': True})

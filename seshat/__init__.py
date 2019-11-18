@@ -1,4 +1,4 @@
-# from elasticsearch import Elasticsearch
+from elasticsearch import Elasticsearch
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
@@ -9,9 +9,6 @@ from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from seshat.config import Config
 
-
-# app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
-#     if app.config['ELASTICSEARCH_URL'] else None
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -39,6 +36,9 @@ def create_app(config_class=Config):
     login_manager.init_app(app)
     mail.init_app(app)
     admin.init_app(app)
+
+    app.elasticsearch = Elasticsearch([app.config['ELASTICSEARCH_URL']]) \
+        if app.config['ELASTICSEARCH_URL'] else None
 
     # admin.add_view(NewModelView(User, db.session))
     # admin.add_view(NewModelView(Book, db.session))

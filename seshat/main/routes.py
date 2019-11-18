@@ -63,13 +63,12 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
-# @bp.before_request
-# def before_request():
-#     if current_user.is_authenticated:
-#         current_user.last_seen = datetime.utcnow()
-#         db.session.commit()
-#         g.search_form = SearchForm()
-#     # g.locale = str(get_locale())
+@bp.before_request
+def before_request():
+    if current_user.is_authenticated:
+        db.session.commit()
+        g.search_form = SearchForm()
+    # g.locale = str(get_locale())
 
 
 @bp.route('/search', methods=['GET', 'POST'])
@@ -77,14 +76,12 @@ def search():
     if not g.search_form.validate():
         return redirect(url_for('main.home'))
     page = request.args.get('page', 1, type=int)
-    posts, total = Book.search(g.search_form.q.data, page,
-                               current_app.config['BOOKS_PER_PAGE'])
+    books, total = Book.search(g.search_form.q.data, page, 10)
     next_url = url_for('main.search', q=g.search_form.q.data, page=page + 1) \
-        if total > page * current_app.config['POSTS_PER_PAGE'] else None
+        if total > page * 10 else None
     prev_url = url_for('main.search', q=g.search_form.q.data, page=page - 1) \
         if page > 1 else None
-    return render_template('search.html', title='Search', posts=posts,
-                           next_url=next_url, prev_url=prev_url)
+    return render_template('search.html', title='Search', books=books, next_url=next_url, prev_url=prev_url)
 
 
 def save_picture(form_picture, _type):
