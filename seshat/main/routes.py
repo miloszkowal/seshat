@@ -1,63 +1,31 @@
 import os
 import secrets
-from datetime import datetime
 
 from PIL import Image
-from flask import render_template, url_for, flash, redirect, request, g
-from flask_login import login_user, logout_user, current_user, login_required
+from flask import render_template, url_for, flash, redirect, request, g, current_app
+from flask_login import current_user, login_required
 
 from sqlalchemy.exc import IntegrityError
 
-from seshat.forms import (BookForm, RegistrationForm, LoginForm,
-                          UpdateAccountForm, SearchForm, ResetPasswordRequestForm, ResetPasswordForm)
+from seshat.main.forms import BookForm, UpdateAccountForm, SearchForm
+
 from seshat.models import User, Book, Author
-from seshat.email import send_password_reset_email
-from seshat import app, db, bcrypt
+from seshat import db
+from seshat.main import bp
 
 
-@app.route('/')
-@app.route('/home')
+@bp.route('/')
+@bp.route('/home')
 def home():
-    #books = Book.query.all()
     return render_template('home.html', books=[])
 
 
-@app.route('/about')
+@bp.route('/about')
 def about():
     return render_template('about.html', title='About')
 
 
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    registration_form = RegistrationForm()
-    if registration_form.validate_on_submit():
-        hashed_pw = bcrypt.generate_password_hash(registration_form.password.data).decode('utf-8')
-        new_user = User(username=registration_form.username.data, email=registration_form.email.data, password=hashed_pw)
-        db.session.add(new_user)
-        db.session.commit()
-        flash(f'Account for {registration_form.username.data} created!', 'success')
-        return redirect(url_for('login'))
-    return render_template('register.html', title='Register', form=registration_form)
-
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    login_form = LoginForm()
-    if login_form.validate_on_submit():
-        user = User.query.filter_by(email=login_form.email.data).first()
-        if user and user.check_password(login_form.password.data):
-            login_user(user, remember=login_form.remember.data)
-            return redirect(url_for('account'))
-        else:
-            flash('Invalid email or password.', 'danger')
-    return render_template('login.html', title='Login', form=login_form)
-
-
-@app.route('/add_book', methods=['GET', 'POST'])
+@bp.route('/add_book', methods=['GET', 'POST'])
 @login_required
 def add_book():
     add_book_form = BookForm()
@@ -70,7 +38,7 @@ def add_book():
                 flash(str(add_book_form.title.data) + ' added to your account!', 'success')
             except IntegrityError:
                 flash('Book already in your account!', 'warning')
-            except:  # TODO: Remove this later, as it is not PEP8 compliant.
+            except:
                 flash('An unknown error occurred. Please try again later.', 'danger')
         else:
             book = Book(title=add_book_form.title.data)
@@ -82,18 +50,11 @@ def add_book():
             db.session.add(book)
             flash(str(add_book_form.title.data) + ' successfully added to DB!', 'success')
             db.session.commit()
-        return redirect(url_for('my_books'))
+        return redirect(url_for('main.my_books'))
     return render_template('add_book.html', title='Add A Book', form=add_book_form)
 
 
-@app.route('/logout')
-@login_required
-def logout():
-    logout_user()
-    return redirect(url_for('home'))
-
-
-@app.route('/account', methods=['GET', 'POST'])
+@bp.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     count = Book.query.join(User.books).filter(User.id == current_user.id).count()
@@ -102,7 +63,7 @@ def account():
     return render_template('account.html', title='Account', profile_pic=profile_pic, count=count, pages=pages)
 
 
-# @app.before_request
+# @bp.before_request
 # def before_request():
 #     if current_user.is_authenticated:
 #         current_user.last_seen = datetime.utcnow()
@@ -111,16 +72,16 @@ def account():
 #     # g.locale = str(get_locale())
 
 
-@app.route('/search', methods=['GET', 'POST'])
+@bp.route('/search', methods=['GET', 'POST'])
 def search():
     if not g.search_form.validate():
-        return redirect(url_for('home'))
+        return redirect(url_for('main.home'))
     page = request.args.get('page', 1, type=int)
     posts, total = Book.search(g.search_form.q.data, page,
-                               app.config['BOOKS_PER_PAGE'])
-    next_url = url_for('search', q=g.search_form.q.data, page=page + 1) \
-        if total > page * app.config['POSTS_PER_PAGE'] else None
-    prev_url = url_for('search', q=g.search_form.q.data, page=page - 1) \
+                               current_app.config['BOOKS_PER_PAGE'])
+    next_url = url_for('main.search', q=g.search_form.q.data, page=page + 1) \
+        if total > page * current_app.config['POSTS_PER_PAGE'] else None
+    prev_url = url_for('main.search', q=g.search_form.q.data, page=page - 1) \
         if page > 1 else None
     return render_template('search.html', title='Search', posts=posts,
                            next_url=next_url, prev_url=prev_url)
@@ -134,10 +95,10 @@ def save_picture(form_picture, _type):
     _, ext = os.path.splitext(form_picture.filename)
     picture_fn = random_hex + ext
     if _type == 'account':
-        picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+        picture_path = os.path.join(current_app.root_path, 'static/profile_pics', picture_fn)
         output_size = (125, 125)
     elif _type == 'book':
-        picture_path = os.path.join(app.root_path, 'static/book_covers', picture_fn)
+        picture_path = os.path.join(current_app.root_path, 'static/book_covers', picture_fn)
         output_size = (125, 125)
     i = Image.open(form_picture)
     i.thumbnail(output_size)
@@ -145,7 +106,7 @@ def save_picture(form_picture, _type):
     return picture_fn
 
 
-@app.route('/account_settings', methods=['GET', 'POST'])
+@bp.route('/account_settings', methods=['GET', 'POST'])
 @login_required
 def account_settings():
     update_account_form = UpdateAccountForm()
@@ -157,21 +118,21 @@ def account_settings():
         current_user.email = update_account_form.email.data
         db.session.commit()
         flash('Account information has been updated!', 'success')
-        return redirect(url_for('account'))
+        return redirect(url_for('main.account'))
     elif request.method == 'GET':
         update_account_form.username.data = current_user.username
         update_account_form.email.data = current_user.email
     return render_template('account_settings.html', title='Account Settings', form=update_account_form)
 
 
-@app.route('/additional_stats')
+@bp.route('/additional_stats')
 @login_required
 def additional_stats():
     title = 'Additional Stats'
     return render_template('additional_stats.html', title=title)
 
 
-@app.route('/my_books')
+@bp.route('/my_books')
 @login_required
 def my_books():
     title = 'My Books'
@@ -179,63 +140,32 @@ def my_books():
     return render_template('my_books.html', title=title, books=user_books, count=len(user_books))
 
 
-@app.route('/account/delete_account', methods=['POST'])
+@bp.route('/account/delete_account', methods=['POST'])
 @login_required
 def delete_account():
     User.query.filter(User.id == current_user.id).delete()
     db.session.commit()
     flash('Your account has been deleted!', 'success')
-    return redirect(url_for('home'))
+    return redirect(url_for('main.home'))
 
 
-@app.route('/book/<int:book_id>')
+@bp.route('/book/<int:book_id>')
 def book(book_id):
     book = Book.query.get(book_id)
     owner_count = len(book.owners.all())
     return render_template('book.html', count=owner_count, title=book.title, book=book)
 
 
-@app.route('/book/<int:book_id>/delete', methods=['POST'])
+@bp.route('/book/<int:book_id>/delete', methods=['POST'])
 @login_required
 def delete_book(book_id):
     book_to_delete = Book.query.get_or_404(book_id)
     current_user.books.remove(book_to_delete)
     db.session.commit()
-    return redirect(url_for('my_books'))
+    return redirect(url_for('main.my_books'))
 
 
-@app.route('/reset_password_request', methods=['GET', 'POST'])
-def reset_password_request():
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    reset_password_request_form = ResetPasswordRequestForm()
-    if reset_password_request_form.validate_on_submit():
-        user = User.query.filter_by(email=reset_password_request_form.email.data).first()
-        if user:
-            send_password_reset_email(user)
-            flash('Check your email for the instructions to reset your password', 'info')
-            return redirect(url_for('login'))
-    return render_template('reset_password_request.html', title='Reset Password', form=reset_password_request_form)
-
-
-@app.route('/reset_password/<token>', methods=['GET', 'POST'])
-def reset_password(token):
-    if current_user.is_authenticated:
-        return redirect(url_for('home'))
-    user = User.verify_reset_password_token(token)
-    if not user:
-        flash('This token is invalid or expired.', 'danger')
-        return redirect(url_for('home'))
-    reset_password_form = ResetPasswordForm()
-    if reset_password_form.validate_on_submit():
-        user.set_password(reset_password_form.password.data)
-        db.session.commit()
-        flash('Your password has been reset!', 'success')
-        return redirect(url_for('login'))
-    return render_template('reset_password.html', title='Reset Password', form=reset_password_form)
-
-
-@app.route('/author/<int:author_id>')
+@bp.route('/author/<int:author_id>')
 def author(author_id):
     author = Author.query.get_or_404(author_id)
     return render_template('author.html', title=author.first_name, author=author)

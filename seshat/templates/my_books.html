@@ -5,16 +5,16 @@
   <h2>Total Books: {{ count }}</h2>
 
   {% if count==0 %}
-  <p>It appears you have no books. Why not <a href="{{ url_for('add_book') }}">add one</a>?</p>
+  <p>It appears you have no books. Why not <a href="{{ url_for('main.add_book') }}">add one</a>?</p>
   {% endif %}
 
   {% for book in books %}
   <article class="media content-section">
     <div class="media-body">
       <div class="article-metadata">
-        <a class="mr-2" href="{{ url_for('author', author_id=book.authors[0].id) }}">{{ book.authors[0] }}</a>
+        <a class="mr-2" href="{{ url_for('main.author', author_id=book.authors[0].id) }}">{{ book.authors[0] }}</a>
       </div>
-      <h2><a class="article-title float-left" href="{{ url_for('book', book_id=book.id) }}">{{ book.title }}</a></h2>
+      <h2><a class="article-title float-left" href="{{ url_for('main.book', book_id=book.id) }}">{{ book.title }}</a></h2>
       <button type="button" class="btn btn-danger btn-sm m-1 float-right" data-toggle="modal" data-target="#removeBookModal_{{ book.id }}">Remove</button>
     </div>
   </article>
@@ -38,7 +38,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <form action="{{ url_for('delete_book', book_id=book.id) }}" method="POST">
+        <form action="{{ url_for('main.delete_book', book_id=book.id) }}" method="POST">
           <input type="submit" class="btn btn-danger" value="Remove" name="submit_button">
         </form>
       </div>

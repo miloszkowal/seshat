@@ -2,9 +2,9 @@
       <div class="content-section">
         <h3>Account Sidebar</h3>
         <ul class="list-group mt-2">
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('my_books') }}">My Books</a></li>
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('additional_stats') }}">Additional Stats</a></li>
-            <li class="list-group-item list-group-item-light"><a href="{{ url_for('account_settings') }}">Account Settings</a></li>
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('main.my_books') }}">My Books</a></li>
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('main.additional_stats') }}">Additional Stats</a></li>
+            <li class="list-group-item list-group-item-light"><a href="{{ url_for('main.account_settings') }}">Account Settings</a></li>
             {% if current_user.is_admin == 1 %}
             <li class="list-group-item list-group-item-light"><a href="/admin">DB Admin Panel</a></li>
             {% endif %}

@@ -1,4 +1,6 @@
-from seshat import app
+from seshat import create_app, db
+
+app = create_app()
 
 if __name__ == '__main__':
     app.run()

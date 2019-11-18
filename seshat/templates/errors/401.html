@@ -3,6 +3,6 @@
 <h1>401 Not Authorized</h1>
 <p>You're not authorized to view this page.</p>
 <p>Chances are you're not logged in.</p>
-<a href="{{ url_for('login') }}">Login</a><br>
-<a href="{{ url_for('home') }}">Go Back Home</a>
+<a href="{{ url_for('auth.login') }}">Login</a><br>
+<a href="{{ url_for('main.home') }}">Go Back Home</a>
 {% endblock content %}
