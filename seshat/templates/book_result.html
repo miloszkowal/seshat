@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<article class="media content-section">
+    <div class="media-body">
+      <div class="article-metadata">
+        <a class="mr-2" href="{{ url_for('main.author', author_id=book.authors[0].id) }}">{{ book.authors[0] }}</a>
+    </div>
+    <h2><a class="article-title float-left" href="{{ url_for('main.book', book_id=book.id) }}">{{ book.title }}</a></h2>
+</div>
+</article>
+
+{% endblock content %}
