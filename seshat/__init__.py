@@ -8,6 +8,7 @@ from flask_mail import Mail
 from flask_admin import Admin
 from flask_admin.contrib.sqla import ModelView
 from seshat.config import Config
+# from seshat.models import User, Book, Author
 
 
 db = SQLAlchemy()
@@ -16,6 +17,8 @@ bcrypt = Bcrypt()
 login_manager = LoginManager()
 mail = Mail()
 admin = Admin()
+
+from seshat import views
 
 
 class NewModelView(ModelView):

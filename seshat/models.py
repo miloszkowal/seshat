@@ -141,6 +141,9 @@ class Genre(SearchableMixin, db.Model):
     genre = db.Column(db.String(50), nullable=False)
     books = db.relationship('Book', backref='genre', lazy=True)
 
+    def __repr__(self):
+        return f"<Genre({self.genre})>"
+
 
 class Author(SearchableMixin, db.Model):
     __searchable__ = ['first_name', 'last_name']
@@ -183,6 +186,9 @@ class Language(db.Model):
     lang_code = db.Column(db.String(5))
     lang_name = db.Column(db.String(35))
     books = db.relationship('Book', backref='language', lazy=True)
+
+    def __repr__(self):
+        return f"<Language({self.lang})>"
 
 
 class Subject(db.Model):
