@@ -15,6 +15,29 @@
         <a class="mr-2" href="{{ url_for('main.author', author_id=book.authors[0].id) }}">{{ book.authors[0] }}</a>
       </div>
       <h2><a class="article-title float-left" href="{{ url_for('main.book', book_id=book.id) }}">{{ book.title }}</a></h2>
+      <div class="font-italic">My tags: {{ tags }}</div>
+
+      <form method="POST", action="{{url_for('main.update_tags', book_id=book.id, user_id=current_user.id)}}">
+        {{ form.hidden_tag() }}
+        <fieldset class="form-group">
+          <div class="form-group">
+            {{ form.tag.label(class="form-control-label") }}
+            {% if form.tag.errors %}
+            {{ form.tag(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.tag.errors %}
+                    <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+                {% else %}
+                {{ form.tag(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <div class="form-group">
+          {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+      </form>
       <button type="button" class="btn btn-danger btn-sm m-1 float-right" data-toggle="modal" data-target="#removeBookModal_{{ book.id }}">Remove</button>
     </div>
   </article>
