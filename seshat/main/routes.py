@@ -173,7 +173,7 @@ def author(author_id):
 def get_tags(book_id, user_id):
     return ['foo', 'bar', 'baz']
 
-@bp.route('/book/<int:book_id>/tags/', methods=['POST'])
+@bp.route('/book/<int:book_id>/id/<int:user_id>/update_tags/', methods=['POST'])
 @login_required
-def update_tags(book_id):
+def update_tags(book_id, user_id):
     return redirect(url_for('main.my_books'))
