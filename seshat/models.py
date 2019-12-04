@@ -58,7 +58,8 @@ db.event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
 
 ownership = db.Table('ownership',
                      db.Column('user_id', db.Integer, db.ForeignKey('user.id'), primary_key=True),
-                     db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True)
+                     db.Column('book_id', db.Integer, db.ForeignKey('book.id'), primary_key=True),
+                     db.Column('date_added', db.DateTime, default=datetime.utcnow)
                      )
 
 authorship = db.Table('authorship',
