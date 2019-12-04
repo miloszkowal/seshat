@@ -9,7 +9,7 @@ from sqlalchemy.exc import IntegrityError
 
 from seshat.main.forms import BookForm, UpdateAccountForm, SearchForm, TagForm
 
-from seshat.models import User, Book, Author
+from seshat.models import User, Book, Author, Tagging
 from seshat import db
 from seshat.main import bp
 
@@ -129,13 +129,22 @@ def additional_stats():
     return render_template('additional_stats.html', title=title)
 
 
+@bp.route('/book/<int:book_id>/tags/', methods=['GET'])
+@login_required
+def get_tags(book_id):
+    book = Book.query.get_or_404(book_id)
+    tags = Tagging.query.filter_by(book_tags=book, user_tags=current_user)
+    return tags.all()
+
+
 @bp.route('/my_books', methods=['GET', 'POST'])
 @login_required
 def my_books():
     title = 'My Books'
     user_books = current_user.books
+    test_tags = Tagging.query.filter_by(book=user_books[0], user=current_user).all()
     tag_form = TagForm()
-    return render_template('my_books.html', title=title, books=user_books, count=len(user_books), tags=['foo', 'bar', 'baz'], form=tag_form)
+    return render_template('my_books.html', title=title, books=user_books, count=len(user_books), tags=test_tags, form=tag_form)
 
 
 @bp.route('/account/delete_account', methods=['POST'])
@@ -168,10 +177,6 @@ def author(author_id):
     author = Author.query.get_or_404(author_id)
     return render_template('author.html', title=author.first_name, author=author)
 
-@bp.route('/book/<int:book_id>/tags/', methods=['GET'])
-@login_required
-def get_tags(book_id, user_id):
-    return ['foo', 'bar', 'baz']
 
 @bp.route('/book/<int:book_id>/tags/', methods=['POST'])
 @login_required
