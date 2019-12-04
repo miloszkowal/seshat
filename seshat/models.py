@@ -166,7 +166,7 @@ class Author(SearchableMixin, db.Model):
     __searchable__ = ['first_name', 'last_name']
     id = db.Column(db.Integer, primary_key=True)
     first_name = db.Column(db.String(50), nullable=False)
-    last_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50))
     birth_date = db.Column(db.DateTime)
     death_date = db.Column(db.DateTime)
     books = db.relationship('Book', secondary=authorship, lazy='subquery', backref=db.backref('authors', lazy='dynamic'))

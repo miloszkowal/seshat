@@ -43,7 +43,10 @@ def add_book():
         else:
             book = Book(title=add_book_form.title.data)
             split_name = add_book_form.author.data.split()
-            author = Author(first_name=split_name[0], last_name=split_name[1])
+            if len(split_name) < 2:
+                author = Author(first_name=split_name[0], last_name='')
+            elif len(split_name) == 2:
+                author = Author(first_name=split_name[0], last_name=split_name[1])
             book.authors.append(author)
             book.owners.append(current_user)
             db.session.add(author)
