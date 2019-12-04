@@ -191,6 +191,9 @@ class Publisher(SearchableMixin, db.Model):
     founded = db.Column(db.DateTime)
     books = db.relationship('Book', backref='publisher', lazy=True)
 
+    def __repr__(self):
+        return f"<Publisher({self.org_name})>"
+
 
 class Language(db.Model):
     """
@@ -217,6 +220,9 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.String(100), nullable=False)
     tag_tags = db.relationship('Tagging', lazy='subquery', backref='tag')
+
+    def __repr__(self):
+        return f"<Tag({self.tag})>"
 
 
 class Address(db.Model):
