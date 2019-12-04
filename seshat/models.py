@@ -72,9 +72,23 @@ book_subject = db.Table('book_subject',
                         )
 
 
-# TODO: add association table for book tagging
-# tags = db.Table('tags',
-#     db.Column())
+class Tagging(db.Model):
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    book_id = db.Column(db.Integer, db.ForeignKey('book.id'), primary_key=True)
+    tag_id = db.Column(db.Integer, db.ForeignKey('tag.id'), primary_key=True)
+
+    db.UniqueConstraint('user_id', 'book_id', 'tag_id')
+    db.relationship('User', backref='tags', lazy='dynamic')
+    db.relationship('Book', backref='tags', lazy='dynamic')
+    db.relationship('Tag', backref='tags', lazy='dynamic')
+
+    def __init__(self, user, book, tag):
+        self.user_id = user.id
+        self.book_id = book.id
+        self.tag_id = tag.id
+
+    def __repr__(self):
+        return f"<Tagging({self.user_id},{self.book_id},{self.tag_id})>"
 
 
 class User(SearchableMixin, db.Model, UserMixin):
@@ -88,6 +102,7 @@ class User(SearchableMixin, db.Model, UserMixin):
     password = db.Column(db.String(60), nullable=False)
     is_admin = db.Column(db.Integer, default=0)
     books = db.relationship('Book', secondary=ownership, lazy='subquery', backref=db.backref('owners', lazy='dynamic'))
+    user_tags = db.relationship('Tagging', lazy='subquery', backref='user')
 
     @property
     def full_name(self):
@@ -130,6 +145,7 @@ class Book(SearchableMixin, db.Model):
     language_id = db.Column(db.Integer, db.ForeignKey('language.id'))
     msrp = db.Column(db.Float)
     cover_image = db.Column(db.String(20), nullable=False, default='default_book.png')
+    book_tags = db.relationship('Tagging', lazy='subquery', backref='book')
 
     def __repr__(self):
         return f"<Book('{self.title}')>"
@@ -200,6 +216,7 @@ class Subject(db.Model):
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     tag = db.Column(db.String(100), nullable=False)
+    tag_tags = db.relationship('Tagging', lazy='subquery', backref='tag')
 
 
 class Address(db.Model):
