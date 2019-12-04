@@ -17,7 +17,7 @@ class TagForm(FlaskForm):
     tag = StringField('Tags')
     submit = SubmitField('Add')
 
-    
+
 class SearchForm(FlaskForm):
     q = StringField('Search', validators=[InputRequired()])
 
