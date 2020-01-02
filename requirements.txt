@@ -1,13 +1,14 @@
 alembic==1.1.0
+aniso8601==8.0.0
 blinker==1.4
 cffi==1.12.3
 Click==7.0
-elasticsearch==7.0.5
 Flask==1.1.1
 Flask-Admin==1.5.4
 Flask-Login==0.4.1
 Flask-Mail==0.9.1
 Flask-Migrate==2.5.2
+Flask-RESTful==0.3.7
 Flask-SQLAlchemy==2.4.0
 Flask-WTF==0.14.2
 gunicorn==19.9.0
@@ -21,6 +22,7 @@ pycparser==2.19
 PyJWT==1.7.1
 python-dateutil==2.8.0
 python-editor==1.0.4
+pytz==2019.3
 six==1.12.0
 SQLAlchemy==1.3.8
 urllib3==1.25.6
