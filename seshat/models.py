@@ -5,7 +5,9 @@ import jwt
 from flask import current_app
 from flask_login import UserMixin
 
-from seshat import db, login_manager, bcrypt
+from werkzeug.security import generate_password_hash, check_password_hash
+
+from seshat import db, login_manager
 from seshat.search import add_to_index, remove_from_index, query_index
 
 
@@ -110,10 +112,10 @@ class User(SearchableMixin, db.Model, UserMixin):
         return f"{self.first_name} {self.last_name}"
 
     def set_password(self, password):
-        self.password = bcrypt.generate_password_hash(password).decode('utf-8')
+        self.password = generate_password_hash(password).decode('utf-8')
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)
+        return check_password_hash(self.password, password)
 
     def get_reset_password_token(self, expires_in=600):
         return jwt.encode(

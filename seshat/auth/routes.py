@@ -1,9 +1,11 @@
 from flask import render_template, url_for, flash, redirect
 from flask_login import current_user, login_user, logout_user, login_required
 
+from werkzeug.security import generate_password_hash
+
 from seshat.auth.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, ResetPasswordForm
 from seshat.models import User
-from seshat import db, bcrypt
+from seshat import db
 from seshat.auth import bp
 from seshat.auth.email import send_password_reset_email
 
@@ -14,7 +16,7 @@ def register():
         return redirect(url_for('home'))
     registration_form = RegistrationForm()
     if registration_form.validate_on_submit():
-        hashed_pw = bcrypt.generate_password_hash(registration_form.password.data).decode('utf-8')
+        hashed_pw = generate_password_hash(registration_form.password.data).decode('utf-8')
         new_user = User(username=registration_form.username.data, email=registration_form.email.data, password=hashed_pw)
         db.session.add(new_user)
         db.session.commit()
