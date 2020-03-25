@@ -130,3 +130,6 @@ seshat/site.db
 site.db
 seshat/site.db
 *.db
+
+# VSCode stuff
+.vscode/
